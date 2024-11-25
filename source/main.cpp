@@ -1,15 +1,20 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "akinator_logic.h"
 #include "tree.h"
 
 int main()
 {
-    Tree* tree = treeCtor();
+    Akinator akinator = {.akinator_tree = treeCtor()};
 
-    treeAddNode(tree, 10);
-    treeAddNode(tree, 20);
-    treeAddNode(tree, 5);
-    treeAddNode(tree, 2);
+    while (true)
+    {
+        akinatorQuess(&akinator);
 
-    treeDtor(tree);
+        treeBackToTop(akinator.akinator_tree);
+    }
+    treeDtor(akinator.akinator_tree);
 
     return 0;
 }

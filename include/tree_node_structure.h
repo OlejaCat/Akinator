@@ -18,9 +18,10 @@ typedef struct TreeNode
 
 typedef struct Tree
 {
-    TreeNode*   start_node;
+    TreeNode* start_node;
+    TreeNode* current_node;
 
-    size_t      nodes_number;
+    size_t    nodes_number;
 
 #if defined(_LOGGER) || defined(_DUMP)
     const char* file;

@@ -15,7 +15,7 @@ static void treePrintRecursively(TreeNode* node);
 #if defined(_DUMP) || defined(_LOGGER)
 static void treeMakeGraphvizPng(Tree* tree);
 static const char* getLineFromFile(const char* file_name, int line_number);
-static void graphvizRecursizeWriteNodes(FILE* graphviz_file, TreeNode* node);
+static void graphvizRecursizeWriteNodes(FILE* graphviz_file, TreeNode* node, TreeNode* current_node);
 
 static const char* TEMP_GRAPHVIZ_FILE_PATH = "tmp_.dot";
 static const char* GRAPHVIZ_PNG_PATH       = "pictures/dump";
@@ -142,6 +142,7 @@ void treeDumpToHtm_(Tree* tree)
     fprintf(output_file, "<h3>Tree pointer [%p]\n", tree);
     fprintf(output_file, "\tstart node addr  [%p]\n", tree->start_node);
     fprintf(output_file, "\tnumber of nodes = %lu\n", tree->nodes_number);
+    fprintf(output_file, "\tcurrent node     [%p]\n", tree->current_node);
     fprintf(output_file, "Image of tree:</h3>\n");
 
     treeMakeGraphvizPng(tree);
@@ -165,7 +166,7 @@ static void treePrintRecursively(TreeNode* node)
         return;
     }
 
-    printf("Pointer on current node [%p]. \"Number\" is %lu\nValue: %d\n",
+    printf("Pointer on current node [%p]. \"Number\" is %lu\nValue: %s\n",
             node,
             node->node_index,
             node->data);
@@ -194,7 +195,7 @@ static void treeMakeGraphvizPng(Tree* tree)
     fprintf(graphviz_file, "    node [shape=box, fontname=\"Arial\", fontsize=12, "
                            "fontcolor=white];\n\n");
 
-    graphvizRecursizeWriteNodes(graphviz_file, tree->start_node);
+    graphvizRecursizeWriteNodes(graphviz_file, tree->start_node, tree->current_node);
 
     fprintf(graphviz_file, "}\n");
 
@@ -208,7 +209,7 @@ static void treeMakeGraphvizPng(Tree* tree)
 }
 
 
-static void graphvizRecursizeWriteNodes(FILE* graphviz_file, TreeNode* node)
+static void graphvizRecursizeWriteNodes(FILE* graphviz_file, TreeNode* node, TreeNode* current_node)
 {
     assert(graphviz_file != NULL);
 
@@ -219,23 +220,31 @@ static void graphvizRecursizeWriteNodes(FILE* graphviz_file, TreeNode* node)
 
     fprintf(graphviz_file,
             "node%lu [label=<" \
-            "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" BGCOLOR=\"#705833\" " \
-            "COLOR=\"white\">\n" \
-            "<TR><TD COLSPAN=\"2\">parent address %p</TD></TR>\n" \
-            "<TR><TD COLSPAN=\"2\">address %p</TD></TR>\n" \
-            "<TR><TD COLSPAN=\"2\">data = %d</TD></TR>\n" \
-            "<TR><TD>left %p</TD><TD>right %p</TD></TR>\n" \
-            "</TABLE>\n" \
-            ">];\n",
-            node->node_index,
-            node->parent_node,
-            node,
-            node->data,
-            node->left_node,
-            node->right_node);
+            "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" BGCOLOR=\"#705833\" ",
+            node->node_index);
+    if (node->node_index == current_node->node_index)
+    {
+        fprintf(graphviz_file, "COLOR=\"yellow\">\n");
+    }
+    else
+    {
+        fprintf(graphviz_file, "COLOR=\"white\">\n");
+    }
+    fprintf(graphviz_file,
+           "<TR><TD COLSPAN=\"2\">parent address %p</TD></TR>\n" \
+           "<TR><TD COLSPAN=\"2\">address %p</TD></TR>\n" \
+           "<TR><TD COLSPAN=\"2\">data = %s</TD></TR>\n" \
+           "<TR><TD>left %p</TD><TD>right %p</TD></TR>\n" \
+           "</TABLE>\n" \
+           ">];\n",
+           node->parent_node,
+           node,
+           node->data,
+           node->left_node,
+           node->right_node);
 
-    graphvizRecursizeWriteNodes(graphviz_file, node->left_node);
-    graphvizRecursizeWriteNodes(graphviz_file, node->right_node);
+    graphvizRecursizeWriteNodes(graphviz_file, node->left_node, current_node);
+    graphvizRecursizeWriteNodes(graphviz_file, node->right_node, current_node);
 
     if (node->parent_node == NULL)
     {

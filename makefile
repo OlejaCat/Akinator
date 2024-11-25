@@ -16,14 +16,14 @@ CFLAGS += -Waggressive-loop-optimizations -Wmissing-declarations -Wcast-align -W
 endif
 
 INCLUDES := -Iinclude
-SRCS := source/main.cpp source/tree.cpp source/tree_dump.cpp
+SRCS := source/main.cpp source/tree.cpp source/tree_dump.cpp source/akinator_logic.cpp
 OBJS := $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(notdir $(SRCS)))
 
 ASAN_FLAGS := -fsanitize=address,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
 
-CFLAGS += $(INCLUDES) $(ASAN_FLAGS) -lm -D_LOGGER
+CFLAGS += $(INCLUDES) $(ASAN_FLAGS) -lm -D_LOGGER -D_DUMP
 
-TARGET := tree
+TARGET := akinator
 
 all: $(BUILD_DIR) $(TARGET)
 

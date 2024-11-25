@@ -16,6 +16,9 @@ static void recursiveDestructTree(TreeNode* node);
 // public --------------------------------------------------------------------------------------------------------------
 
 
+// --------------------------------------- CONSTRUCTOR -----------------------------------------------------------------
+
+
 Tree* treeCtor_(DUMP_PARAMETERS)
 {
 #if defined(_DUMP) || defined(_LOGGER)
@@ -24,8 +27,13 @@ Tree* treeCtor_(DUMP_PARAMETERS)
 #endif
 
     Tree* tree = (Tree*)calloc(1, sizeof(Tree));
+    if (tree == NULL)
+    {
+        return NULL;
+    }
 
     tree->start_node   = NULL;
+    tree->current_node = NULL;
     tree->nodes_number = 0;
 
 #if defined(_DUMP) || defined(_LOGGER)
@@ -43,7 +51,10 @@ Tree* treeCtor_(DUMP_PARAMETERS)
 }
 
 
-void treeAddNode_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
+// ------------------------------------------ RETURN INFORMATION -------------------------------------------------------
+
+
+bool treeIsNodeEnd_(Tree* tree LOGGER_PARAMETERS)
 {
     assert(tree != NULL);
 
@@ -52,7 +63,318 @@ void treeAddNode_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     assert(function  != NULL);
 #endif
 
-    TreeNode* current_node = tree->start_node;
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+
+    TreeNode* node = tree->current_node;
+
+    return node->left_node == NULL && node->right_node == NULL;
+}
+
+
+tree_node_type treeGetCurrentNodeData_(Tree* tree LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+
+    if (tree->current_node == NULL)
+    {
+        return NULL;
+    };
+
+    return tree->current_node->data;
+}
+
+
+// ------------------------------------------ MOVE ---------------------------------------------------------------------
+
+
+void treeBackToTop_(Tree* tree LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+    tree->current_node = tree->start_node;
+
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+}
+
+
+void treeBackToParentNode_(Tree* tree LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+    if (tree->current_node->parent_node == NULL)
+    {
+        return;
+    }
+
+    tree->current_node = tree->current_node->parent_node;
+
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+}
+
+
+
+MoveState treeMoveToLeftNode_(Tree* tree LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+    if (tree->current_node->left_node == NULL)
+    {
+        return MoveState_EMPTY_NODE;
+    }
+
+    tree->current_node = tree->current_node->left_node;
+
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+
+    return MoveState_MOVED_TO_NEXT;
+}
+
+
+MoveState treeMoveToRightNode_(Tree* tree LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+    if (tree->current_node->right_node == NULL)
+    {
+        return MoveState_EMPTY_NODE;
+    }
+
+    tree->current_node = tree->current_node->right_node;
+
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+
+    return MoveState_MOVED_TO_NEXT;
+}
+
+
+// ------------------------------------------ ADD ----------------------------------------------------------------------
+
+
+void treeInsertOnLeft_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+    TreeNode* node = createNewNode(data, tree->current_node, tree->nodes_number);
+    tree->nodes_number++;
+
+    if (tree->current_node == NULL)
+    {
+        tree->start_node = node;
+        tree->current_node = node;
+        return;
+    }
+
+    if (tree->current_node->left_node != NULL)
+    {
+        TreeNode* left_node = tree->current_node->left_node;
+        node->left_node = left_node;
+    }
+
+    tree->current_node->left_node = node;
+
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+}
+
+
+void treeInsertOnRight_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+    TreeNode* node = createNewNode(data, tree->current_node, tree->nodes_number);
+    tree->nodes_number++;
+
+    if (tree->current_node == NULL)
+    {
+        tree->start_node = node;
+        tree->current_node = node;
+        return;
+    }
+
+    if (tree->current_node->left_node != NULL)
+    {
+        TreeNode* right_node = tree->current_node->right_node;
+        node->right_node = right_node;
+    }
+
+    tree->current_node->right_node = node;
+
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+}
+
+
+void treeInsertOnTopLeft_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+    if (tree->current_node->parent_node == NULL)
+    {
+        return;
+    }
+
+    TreeNode* node = createNewNode(data, tree->current_node->parent_node, tree->nodes_number);
+    tree->nodes_number++;
+
+    if (tree->current_node->parent_node->left_node == tree->current_node)
+    {
+        tree->current_node->parent_node->left_node = node;
+    }
+    else
+    {
+        tree->current_node->parent_node->right_node = node;
+    }
+
+    node->left_node = tree->current_node;
+    tree->current_node->parent_node = node;
+
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+}
+
+
+void treeInsertOnTopRight_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+    if (tree->current_node->parent_node == NULL)
+    {
+        return;
+    }
+
+    TreeNode* node = createNewNode(data, tree->current_node->parent_node, tree->nodes_number);
+    tree->nodes_number++;
+
+    if (tree->current_node->parent_node->left_node == tree->current_node)
+    {
+        tree->current_node->parent_node->left_node = node;
+    }
+    else
+    {
+        tree->current_node->parent_node->right_node = node;
+    }
+
+    node->right_node = tree->current_node;
+    tree->current_node->parent_node = node;
+
+#ifdef _LOGGER
+    tree->file     = file_name;
+    tree->line     = line_number;
+    tree->function = function;
+
+    treeLogState(tree);
+#endif
+}
+
+
+void treeAddNodeBinary_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
+{
+    assert(tree != NULL);
+
+#ifdef _LOGGER
+    assert(file_name != NULL);
+    assert(function  != NULL);
+#endif
+
+    TreeNode* current_node = tree->current_node;
     TreeNode* parent_node  = NULL;
     while (current_node != NULL)
     {
@@ -67,7 +389,8 @@ void treeAddNode_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
 
     if (parent_node == NULL)
     {
-        tree->start_node = new_node;
+        tree->start_node   = new_node;
+        tree->current_node = new_node;
 
         return;
     }
@@ -89,6 +412,9 @@ void treeAddNode_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     treeLogState(tree);
 #endif
 }
+
+
+// --------------------------------------- DESTRUCTOR -----------------------------------------------------------------
 
 
 void treeDtor_(Tree* tree LOGGER_PARAMETERS)
@@ -152,6 +478,7 @@ static void recursiveDestructTree(TreeNode* node)
     recursiveDestructTree(node->left_node);
     recursiveDestructTree(node->right_node);
 
+    free(node->data);
     free(node);
 }
 
