@@ -3,6 +3,7 @@
 
 #include "akinator_logic.h"
 
-void akinatorReadDataBaseFromFile(Akinator* akinator, const char* file_path);
+void akinatorReadDataBaseFromJSON(Akinator* akinator, const char* file_path);
+void akinatorSaveDataBaseToJSON(Akinator* akinator, const char* file_name);
 
 #endif // AKINATOR_FILES_WORK_H

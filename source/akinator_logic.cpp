@@ -66,6 +66,12 @@ void akinatorQuess(Akinator* akinator)
 }
 
 
+void akinatorGetObjectDescription(Akinator* akinator, const char* object)
+{
+
+}
+
+
 // static --------------------------------------------------------------------------------------------------------------
 
 

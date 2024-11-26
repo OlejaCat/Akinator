@@ -1,5 +1,6 @@
 #include "tree.h"
 
+#include <stdio.h>
 #include <assert.h>
 
 #include "tree_node_structure.h"
@@ -9,8 +10,15 @@
 // static --------------------------------------------------------------------------------------------------------------
 
 
+typedef struct DataOfNodesArray
+{
+    DataOfNode* data_of_nodes;
+    size_t      index;
+} DataOfNodesArray;
+
 static TreeNode* createNewNode(tree_node_type data, TreeNode* parent_node, size_t index);
 static void recursiveDestructTree(TreeNode* node);
+static void preOrderTravers(TreeNode* tree_node, int depth, DataOfNodesArray* data_struct);
 
 #define ASSERT_FOR_LOGGER_ assert(file_name != NULL); \
                            assert(function  != NULL);
@@ -58,6 +66,13 @@ Tree* treeCtor_(DUMP_PARAMETERS)
 // ------------------------------------------ RETURN INFORMATION -------------------------------------------------------
 
 
+size_t treeNodesQuantity(Tree* tree)
+{
+    assert(tree != NULL);
+
+    return tree->nodes_number;
+}
+
 bool treeIsNodeEnd_(Tree* tree LOGGER_PARAMETERS)
 {
     assert(tree != NULL);
@@ -98,6 +113,29 @@ tree_node_type treeGetCurrentNodeData_(Tree* tree LOGGER_PARAMETERS)
     };
 
     return tree->current_node->data;
+}
+
+
+DataOfNode* treeGetPathToNode(Tree* tree, tree_node_type node)
+{
+    return
+}
+
+
+DataOfNode* treePreOrderTravers(Tree* tree)
+{
+    assert(tree != NULL);
+
+    DataOfNode* data_of_nodes = (DataOfNode*)calloc(tree->nodes_number, sizeof(DataOfNode));
+
+    DataOfNodesArray data_struct = {
+        .data_of_nodes = data_of_nodes,
+        .index         = 0,
+    };
+
+    preOrderTravers(tree->start_node, 1, &data_struct);
+
+    return data_of_nodes;
 }
 
 
@@ -422,6 +460,33 @@ void treeDtor_(Tree* tree LOGGER_PARAMETERS)
 
 
 // static --------------------------------------------------------------------------------------------------------------
+
+
+static void preOrderTravers(TreeNode* tree_node, int depth, DataOfNodesArray* data_struct)
+{
+    if (tree_node)
+    {
+        OnWhatBranch branch = OnWhatBranch_NONE;
+        if (tree_node->parent_node != NULL)
+        {
+            branch = tree_node->parent_node->left_node == tree_node
+                        ? OnWhatBranch_LEFT
+                        : OnWhatBranch_RIGHT;
+        }
+
+        printf("depth: %d %s\n", depth, tree_node->data);
+        data_struct->data_of_nodes[data_struct->index] = {
+            .depth         = depth,
+            .data          = tree_node->data,
+            .is_end        = tree_node->left_node == NULL && tree_node->right_node == NULL,
+            .parent_branch = branch,
+        };
+        data_struct->index++;
+
+        preOrderTravers(tree_node->left_node, depth + 1, data_struct);
+        preOrderTravers(tree_node->right_node, depth + 1, data_struct);
+    }
+}
 
 
 static TreeNode* createNewNode(tree_node_type data,

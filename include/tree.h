@@ -1,6 +1,7 @@
 #ifndef DESICION_TREE_H
 #define DESICION_TREE_H
 
+#include <stdlib.h>
 #include <stdbool.h>
 
 typedef char* tree_node_type;
@@ -26,6 +27,22 @@ typedef enum MoveState
     MoveState_EMPTY_NODE     =  1,
 } MoveState;
 
+typedef enum OnWhatBranch
+{
+    OnWhatBranch_NONE  = 0,
+    OnWhatBranch_LEFT  = 1,
+    OnWhatBranch_RIGHT = 2,
+} OnWhatBranch;
+
+
+typedef struct DataOfNode
+{
+    int            depth;
+    tree_node_type data;
+    bool           is_end;
+    OnWhatBranch   parent_branch;
+} DataOfNode;
+
 Tree* treeCtor_(DUMP_PARAMETERS);
 void treeDtor_(Tree* tree LOGGER_PARAMETERS);
 void treeAddNodeBinary_(Tree* tree, tree_node_type data LOGGER_PARAMETERS);
@@ -39,6 +56,9 @@ void treeBackToTop_(Tree* tree LOGGER_PARAMETERS);
 bool treeIsNodeEnd_(Tree* tree LOGGER_PARAMETERS);
 void treeInsertOnTopLeft_(Tree* tree, tree_node_type data LOGGER_PARAMETERS);
 void treeInsertOnTopRight_(Tree* tree, tree_node_type data LOGGER_PARAMETERS);
+DataOfNode* treePreOrderTravers(Tree* tree);
+size_t treeNodesQuantity(Tree* tree);
+DataOfNode* treeGetPathToNode(Tree* tree, tree_node_type node);
 
 #if defined(_DUMP) || defined(_LOGGER)
     #define treeCtor() treeCtor_(__FILE__, __LINE__, __PRETTY_FUNCTION__)
