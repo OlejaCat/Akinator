@@ -12,6 +12,13 @@
 static TreeNode* createNewNode(tree_node_type data, TreeNode* parent_node, size_t index);
 static void recursiveDestructTree(TreeNode* node);
 
+#define ASSERT_FOR_LOGGER_ assert(file_name != NULL); \
+                           assert(function  != NULL);
+
+#define PASTE_DATA_LOGGER_ tree->file     = file_name; \
+                           tree->line     = line_number; \
+                           tree->function = function;
+
 
 // public --------------------------------------------------------------------------------------------------------------
 
@@ -22,8 +29,7 @@ static void recursiveDestructTree(TreeNode* node);
 Tree* treeCtor_(DUMP_PARAMETERS)
 {
 #if defined(_DUMP) || defined(_LOGGER)
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     Tree* tree = (Tree*)calloc(1, sizeof(Tree));
@@ -37,9 +43,7 @@ Tree* treeCtor_(DUMP_PARAMETERS)
     tree->nodes_number = 0;
 
 #if defined(_DUMP) || defined(_LOGGER)
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 #endif
 
 #ifdef _LOGGER
@@ -59,14 +63,11 @@ bool treeIsNodeEnd_(Tree* tree LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -82,14 +83,11 @@ tree_node_type treeGetCurrentNodeData_(Tree* tree LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -111,16 +109,13 @@ void treeBackToTop_(Tree* tree LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     tree->current_node = tree->start_node;
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -132,9 +127,13 @@ void treeBackToParentNode_(Tree* tree LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
+
+    if (tree->current_node == NULL)
+    {
+        return;
+    }
 
     if (tree->current_node->parent_node == NULL)
     {
@@ -144,9 +143,7 @@ void treeBackToParentNode_(Tree* tree LOGGER_PARAMETERS)
     tree->current_node = tree->current_node->parent_node;
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -159,8 +156,7 @@ MoveState treeMoveToLeftNode_(Tree* tree LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     if (tree->current_node->left_node == NULL)
@@ -171,9 +167,7 @@ MoveState treeMoveToLeftNode_(Tree* tree LOGGER_PARAMETERS)
     tree->current_node = tree->current_node->left_node;
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -187,8 +181,7 @@ MoveState treeMoveToRightNode_(Tree* tree LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     if (tree->current_node->right_node == NULL)
@@ -199,9 +192,7 @@ MoveState treeMoveToRightNode_(Tree* tree LOGGER_PARAMETERS)
     tree->current_node = tree->current_node->right_node;
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -218,8 +209,7 @@ void treeInsertOnLeft_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     TreeNode* node = createNewNode(data, tree->current_node, tree->nodes_number);
@@ -241,9 +231,7 @@ void treeInsertOnLeft_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     tree->current_node->left_node = node;
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -255,8 +243,7 @@ void treeInsertOnRight_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     TreeNode* node = createNewNode(data, tree->current_node, tree->nodes_number);
@@ -278,9 +265,7 @@ void treeInsertOnRight_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     tree->current_node->right_node = node;
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -292,8 +277,7 @@ void treeInsertOnTopLeft_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     if (tree->current_node->parent_node == NULL)
@@ -317,9 +301,7 @@ void treeInsertOnTopLeft_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     tree->current_node->parent_node = node;
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -331,8 +313,7 @@ void treeInsertOnTopRight_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     if (tree->current_node->parent_node == NULL)
@@ -356,9 +337,7 @@ void treeInsertOnTopRight_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     tree->current_node->parent_node = node;
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -370,8 +349,7 @@ void treeAddNodeBinary_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     TreeNode* current_node = tree->current_node;
@@ -405,9 +383,7 @@ void treeAddNodeBinary_(Tree* tree, tree_node_type data LOGGER_PARAMETERS)
     }
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -422,8 +398,7 @@ void treeDtor_(Tree* tree LOGGER_PARAMETERS)
     assert(tree != NULL);
 
 #ifdef _LOGGER
-    assert(file_name != NULL);
-    assert(function  != NULL);
+    ASSERT_FOR_LOGGER_
 #endif
 
     if (tree == NULL)
@@ -436,9 +411,7 @@ void treeDtor_(Tree* tree LOGGER_PARAMETERS)
 #endif
 
 #ifdef _LOGGER
-    tree->file     = file_name;
-    tree->line     = line_number;
-    tree->function = function;
+    PASTE_DATA_LOGGER_
 
     treeLogState(tree);
 #endif
@@ -482,3 +455,6 @@ static void recursiveDestructTree(TreeNode* node)
     free(node);
 }
 
+
+#undef ASSERT_FOR_LOGGER_
+#undef PASTE_DATA_LOGGER_
